@@ -1,0 +1,12 @@
+.signupPara{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #111010;
+    border-radius: 10px;
+    height: 53px;
+    width: 115px;
+    font-weight: normal;
+    font-size: 24px;
+    cursor: pointer;
+}
