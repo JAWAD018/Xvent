@@ -1,6 +1,8 @@
 body{
     height: 100%;
     width: 100%;
-    border: 1px solid red;
-    font-family: "Inter", sans-serif
+    /* border: 1px solid red; */
+    font-family: "Inter", sans-serif;
+    background-color: #FAF9F2;
+    padding: 0 91px;
 }

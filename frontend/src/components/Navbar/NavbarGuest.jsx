@@ -4,6 +4,7 @@ import XventLogo from "../../assets/HomePageUtils/XventLogo.png";
 import LoginBtn from "../Buttons/LoginBtn/LoginBtn";
 import SignupBtn from "../Buttons/SignupBtn/SignupBtn";
 import { IoMdAddCircleOutline } from "react-icons/io";
+import { Link } from "react-router-dom";
 
 const NavbarGuest = () => {
   const Navlinks = [
@@ -20,7 +21,9 @@ const NavbarGuest = () => {
   return (
     <nav id="navbarContainer">
       <div id="mainLogo">
+        <Link to="/">
         <img src={XventLogo} alt="Xvent Logo" />
+        </Link>
       </div>
 
       <div className="NavbarNavLinks">
