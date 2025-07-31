@@ -1,12 +1,19 @@
-.signupPara{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #111010;
-    border-radius: 10px;
-    height: 53px;
-    width: 115px;
-    font-weight: normal;
-    font-size: 24px;
-    cursor: pointer;
+.singupBtnContainer {
+  height: 53px;
+  width: 115px;
+  text-decoration: none;
+}
+
+.signupPara {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #111010;
+  border-radius: 10px;
+  height: 100%;
+  width: 100%;
+  color: #111010;
+  font-weight: normal;
+  font-size: 24px;
+  cursor: pointer;
 }

@@ -1,12 +1,12 @@
 import React from "react";
-import "./NavbarGuest.css";
+import "./NavbarDesktop.css";
 import XventLogo from "../../assets/HomePageUtils/XventLogo.png";
 import LoginBtn from "../Buttons/LoginBtn/LoginBtn";
 import SignupBtn from "../Buttons/SignupBtn/SignupBtn";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Link } from "react-router-dom";
 
-const NavbarGuest = () => {
+const NavbarDesktop = () => {
   const Navlinks = [
     {
       NavTitle: "Home",
@@ -42,4 +42,4 @@ const NavbarGuest = () => {
   );
 };
 
-export default NavbarGuest;
+export default NavbarDesktop;
