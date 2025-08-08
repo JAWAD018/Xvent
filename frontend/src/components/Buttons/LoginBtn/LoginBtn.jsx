@@ -2,13 +2,10 @@ import React from "react";
 import "./LoginBtn.css";
 import { Link } from "react-router-dom";
 
-const LoginBtn = () => {
-
-
-
+const LoginBtn = ({ title, link }) => {
   return (
-    <Link to="/signin" className="LoginBtnContainer">
-      <p className="LoginPara">Login</p>
+    <Link to={link} className="LoginBtnContainer">
+      <p className="LoginPara">{title}</p>
     </Link>
   );
 };

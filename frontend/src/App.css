@@ -13,6 +13,7 @@
   --space-sm: 8px;
   --space-md: 16px;
   --space-lg: 32px;
+  --space-custom : 0 91px;
 
   --font-base: "Inter", sans-serif;
   --font-base-secondary: "Poppins", sans-serif;
@@ -35,6 +36,7 @@ body {
 
 .main-content {
   width: 100%;
+  padding: var(--space-custom);
 }
 
 .page-container {

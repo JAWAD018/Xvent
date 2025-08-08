@@ -12,31 +12,27 @@ const NavbarDesktop = () => {
       NavTitle: "Home",
       link: "/",
     },
-    {
-      NavTitle: "About",
-      link: "/about",
-    },
   ];
 
   return (
     <nav id="navbarContainer">
-      <div id="mainLogo">
-        <Link to="/">
-        <img src={XventLogo} alt="Xvent Logo" />
-        </Link>
-      </div>
-
       <div className="NavbarNavLinks">
         <ul>
           {Navlinks.map((links, index) => (
             <li key={index}>{links.NavTitle}</li>
           ))}
-          <IoMdAddCircleOutline fontSize={"30px"} cursor={"pointer"}/>
         </ul>
+        <IoMdAddCircleOutline fontSize={"30px"} cursor={"pointer"} />
       </div>
+      <div id="mainLogo">
+        <Link to="/">
+          <img src={XventLogo} alt="Xvent Logo" />
+        </Link>
+      </div>
+
       <div className="NavbarBtns">
-        <LoginBtn />
-        <SignupBtn />
+        <LoginBtn title="Login" link="/signin" />
+        <SignupBtn title="Sign up" link="/signup" theme="black" txtFont={"medium"}/>
       </div>
     </nav>
   );
