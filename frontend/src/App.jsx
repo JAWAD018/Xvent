@@ -18,7 +18,7 @@ const WithLayout = ({ children }) => (
   <div className="app-wrapper">
     <NavbarDesktop />
     <main className="main-content">{children}</main>
-    <Footer />
+    {/* <Footer /> */}
   </div>
 );
 

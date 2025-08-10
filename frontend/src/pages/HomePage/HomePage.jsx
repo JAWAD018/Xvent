@@ -1,6 +1,7 @@
 import React from "react";
 import "./HomePage.css";
 import Slide from "../../components/Slides/Slide";
+import HomePageFeatureCard from "../../components/Cards/HomePageFeatureCard/HomePageFeatureCard";
 
 const HomePage = () => {
   return (
@@ -14,6 +15,7 @@ const HomePage = () => {
           something for everyone.
         </p>
       </div>
+      <HomePageFeatureCard/>
     </section>
   );
 };
