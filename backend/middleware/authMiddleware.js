@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-export const protect = async (req, res, next) => {
+export const verifyToken  = async (req, res, next) => {
   let token;
 
   if (
@@ -23,7 +23,7 @@ export const protect = async (req, res, next) => {
   }
 };
 
-export const authorizeRoles = (...roles) => {
+export const verifyRole = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return res

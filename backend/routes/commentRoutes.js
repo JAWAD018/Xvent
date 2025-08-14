@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../middleware/authMiddleware.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 import {
   addComment,
   getCommentsByPost,
@@ -9,7 +9,7 @@ import {
 const router = express.Router();
 
 router.route("/:postId").get(getCommentsByPost);
-router.route("/:postId").post(protect, addComment);
-router.route("/:commentId").delete(protect, deleteComment);
+router.route("/:postId").post(verifyToken, addComment);
+router.route("/:commentId").delete(verifyToken, deleteComment);
 
 export default router;

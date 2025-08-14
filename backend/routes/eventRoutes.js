@@ -1,7 +1,7 @@
 import express from "express";
 import { createEvent, getEvents, getEventById, updateEvent, deleteEvent } from "../controllers/eventController.js";
 import { verifyToken, verifyRole } from "../middleware/authMiddleware.js";
-import ROLES from "../config/roles.js";
+import {ROLES} from "../config/roles.js";
 
 const router = express.Router();
 

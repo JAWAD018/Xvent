@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../middleware/authMiddleware.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 import {
   createPost,
   getPosts,
@@ -11,8 +11,8 @@ import { upload } from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
-router.route("/").get(getPosts).post(protect, upload.single("image"), createPost);
-router.route("/:id").get(getPostById).delete(protect, deletePost);
-router.route("/:id/like").put(protect, likePost);
+router.route("/").get(getPosts).post(verifyToken, upload.single("image"), createPost);
+router.route("/:id").get(getPostById).delete(verifyToken, deletePost);
+router.route("/:id/like").put(verifyToken, likePost);
 
 export default router;

@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../middleware/authMiddleware.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 import {
   getNotifications,
   markAsRead,
@@ -8,8 +8,8 @@ import {
 
 const router = express.Router();
 
-router.route("/").get(protect, getNotifications);
-router.route("/:id/read").put(protect, markAsRead);
-router.route("/:id").delete(protect, deleteNotification);
+router.route("/").get(verifyToken, getNotifications);
+router.route("/:id/read").put(verifyToken, markAsRead);
+router.route("/:id").delete(verifyToken, deleteNotification);
 
 export default router;
