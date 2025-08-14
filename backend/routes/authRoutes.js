@@ -1,8 +1,7 @@
 import { registerUser, loginUser, getCurrentUser } from "../controllers/authController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 import express from "express";
-// import { registerUser, loginUser, getCurrentUser } from "../controllers/authController.js";
-// import { verifyToken } from "../middleware/authMiddleware.js";
+
 import { body } from "express-validator";
 import validateRequest from "../middleware/validateRequest.js";
 
