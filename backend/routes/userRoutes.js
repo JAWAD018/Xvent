@@ -7,6 +7,7 @@ import {
 } from "../controllers/userController.js";
 import { verifyToken, verifyRole } from "../middleware/authMiddleware.js";
 import { ROLES } from "../config/roles.js";
+import { registerUser } from "../controllers/authController.js";
 
 const router = express.Router();
 
@@ -21,5 +22,8 @@ router.put("/:id", verifyToken, verifyRole(ROLES.ADMIN), updateUser);
 
 // @route   DELETE /api/users/:id
 router.delete("/:id", verifyToken, verifyRole(ROLES.ADMIN), deleteUser);
+
+// @route   POST /api/users/register
+router.post("/register", registerUser);
 
 export default router;
