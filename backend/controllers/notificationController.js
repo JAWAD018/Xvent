@@ -1,36 +1,23 @@
-import Notification from "../models/Notification.js";
+const Notification = require('../models/Notification');
 
-export const getNotifications = async (req, res) => {
+// Get notifications
+exports.getNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.find({ user: req.user.id }).sort({ createdAt: -1 });
+    const notifications = await Notification.find({ user: req.user.id })
+      .sort({ createdAt: -1 })
+      .populate('fromUser', 'name avatar');
     res.json(notifications);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
   }
 };
 
-export const markAsRead = async (req, res) => {
+// Mark as read
+exports.markRead = async (req, res) => {
   try {
     await Notification.findByIdAndUpdate(req.params.id, { read: true });
-    res.json({ message: "Notification marked as read" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const deleteNotification = async (req, res) => {
-  try {
-    const notification = await Notification.findOneAndDelete({
-      _id: req.params.id,
-      user: req.user.id
-    });
-
-    if (!notification) {
-      return res.status(404).json({ message: "Notification not found" });
-    }
-
-    res.json({ message: "Notification deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.json({ msg: 'Marked as read' });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
   }
 };

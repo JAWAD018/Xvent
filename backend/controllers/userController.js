@@ -1,67 +1,71 @@
-// import User from "../models/User.js";
+const User = require('../models/User');
+const jwt = require('jsonwebtoken');
 
-// export const getProfile = async (req, res) => {
-//   try {
-//     const user = await User.findById(req.user.id).select("-password");
-//     res.json(user);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-// export const updateProfile = async (req, res) => {
-//   try {
-//     const updates = req.body;
-//     const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true }).select("-password");
-//     res.json(user);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-
-import User from "../models/User.js";
-
-// @desc    Get all users
-export const getUsers = async (req, res) => {
+// Signup
+exports.signup = async (req, res) => {
+  const { name, email, password } = req.body;
   try {
-    const users = await User.find().select("-password");
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    let user = await User.findOne({ email });
+    if (user) return res.status(400).json({ msg: 'User already exists' });
+
+    user = new User({ name, email, password });
+    await user.save();
+
+    const payload = { user: { id: user.id } };
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+      if (err) throw err;
+      res.json({ token });
+    });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
   }
 };
 
-// @desc    Get user by ID
-export const getUserById = async (req, res) => {
+// Login
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
   try {
-    const user = await User.findById(req.params.id).select("-password");
-    if (!user) return res.status(404).json({ message: "User not found" });
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ msg: 'Invalid credentials' });
+
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
+
+    const payload = { user: { id: user.id } };
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+      if (err) throw err;
+      res.json({ token });
+    });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
   }
 };
 
-// @desc    Update user
-export const updateUser = async (req, res) => {
+// Follow/Unfollow (example, expand as needed)
+exports.followUser = async (req, res) => {
   try {
-    const updates = req.body;
-    const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true }).select("-password");
-    if (!user) return res.status(404).json({ message: "User not found" });
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+    const userToFollow = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.user.id);
 
-// @desc    Delete user
-export const deleteUser = async (req, res) => {
-  try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-    res.json({ message: "User deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    if (!userToFollow.followers.includes(currentUser._id)) {
+      await userToFollow.updateOne({ $push: { followers: currentUser._id } });
+      await currentUser.updateOne({ $push: { following: userToFollow._id } });
+
+      // Send notification
+      const io = req.app.get('io');
+      const notification = new require('../models/Notification')({
+        user: userToFollow._id,
+        type: 'follow',
+        fromUser: currentUser._id,
+        message: `${currentUser.name} followed you`,
+      });
+      await notification.save();
+      io.to(userToFollow._id.toString()).emit('newNotification', notification);
+    } else {
+      // Unfollow logic similarly
+    }
+    res.json({ msg: 'Followed' });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
   }
 };

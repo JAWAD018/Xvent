@@ -1,24 +1,12 @@
-import express from "express";
+const express = require('express');
 const router = express.Router();
-import { registerUser } from "../controllers/userController.js"; // Assuming you have a registerUser controller
-// import { jwt } from "../config/jwt.js"; // Import the jwt object if you were using it
+const auth = require('../middleware/auth');
+const { signup, login, followUser } = require('../controllers/userController');
 
-// @desc    Register a new user
-// @route   POST /api/users/register
-// @access  Public
-router.post("/register", registerUser); // Removed verifyToken here
+router.post('/signup', signup);
+router.post('/login', login);
+router.put('/follow/:id', auth, followUser);
 
-// ... other routes, potentially with authentication ...
-
-export default router;
-      // ... response data ...
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error during registration' });
-  }
-});
-
-// ... other routes, potentially with authentication ...
+// TODO: Add unfollow route here later
 
 module.exports = router;

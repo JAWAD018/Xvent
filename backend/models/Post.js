@@ -1,18 +1,16 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
-const postSchema = new mongoose.Schema(
-  {
-    text: { type: String, required: true },
-    image: { type: String, default: "" },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    event: { type: mongoose.Schema.Types.ObjectId, ref: "Event" }, // optional link to event
-  },
-  { timestamps: true }
-);
+const postSchema = new mongoose.Schema({
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  text: { type: String, required: true },
+  image: { type: String }, // URL to uploaded image
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  comments: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    text: { type: String },
+    date: { type: Date, default: Date.now }
+  }],
+  saves: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Bookmarks
+}, { timestamps: true });
 
-export default mongoose.model("Post", postSchema);
+module.exports = mongoose.model('Post', postSchema);

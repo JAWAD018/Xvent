@@ -1,115 +1,71 @@
-// import Post from "../models/Post.js";
-// import cloudinary from "../config/cloudinary.js";
+const Post = require('../models/Post');
+const multer = require('multer');
+const path = require('path');
 
-// export const createPost = async (req, res) => {
-//   try {
-//     let imageUrl = "";
-//     if (req.file) {
-//       const result = await cloudinary.uploader.upload(req.file.path);
-//       imageUrl = result.secure_url;
-//     }
+// Multer setup for image uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)),
+});
+const upload = multer({ storage });
 
-//     const post = await Post.create({
-//       text: req.body.text,
-//       image: imageUrl,
-//       user: req.user.id
-//     });
-
-//     res.status(201).json(post);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-// export const getPosts = async (req, res) => {
-//   try {
-//     const posts = await Post.find().populate("user", "name email");
-//     res.json(posts);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-
-import Post from "../models/Post.js";
-import cloudinary from "../config/cloudinary.js";
-
-// @desc    Create a post
-export const createPost = async (req, res) => {
+// Create post (with image)
+exports.createPost = [upload.single('image'), async (req, res) => {
   try {
-    let imageUrl = "";
-    if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path);
-      imageUrl = result.secure_url;
-    }
-
-    const post = await Post.create({
+    const newPost = new Post({
+      author: req.user.id,
       text: req.body.text,
-      image: imageUrl,
-      user: req.user.id
+      image: req.file ? `/uploads/${req.file.filename}` : null,
     });
-
-    res.status(201).json(post);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    await newPost.save();
+    res.json(newPost);
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
   }
-};
+}];
 
-// @desc    Get all posts
-export const getPosts = async (req, res) => {
+// Get feed (posts from following + public, paginated)
+exports.getFeed = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = 10;
   try {
-    const posts = await Post.find().populate("user", "name email");
+    const user = await require('../models/User').findById(req.user.id);
+    const posts = await Post.find({
+      $or: [{ author: { $in: user.following } }, { author: req.user.id }],
+    })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate('author', 'name avatar');
     res.json(posts);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
   }
 };
 
-// @desc    Get a single post by ID
-export const getPostById = async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id).populate("user", "name email");
-    if (!post) return res.status(404).json({ message: "Post not found" });
-    res.json(post);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// @desc    Delete a post
-export const deletePost = async (req, res) => {
+// Like post (similar for comment, save)
+exports.likePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: "Post not found" });
+    if (!post.likes.includes(req.user.id)) {
+      await post.updateOne({ $push: { likes: req.user.id } });
 
-    if (post.user.toString() !== req.user.id && req.user.role !== "admin") {
-      return res.status(403).json({ message: "Unauthorized" });
+      // Notification
+      const io = req.app.get('io');
+      const notification = new require('../models/Notification')({
+        user: post.author,
+        type: 'like',
+        fromUser: req.user.id,
+        post: post._id,
+        message: 'Someone liked your post',
+      });
+      await notification.save();
+      io.to(post.author.toString()).emit('newNotification', notification);
     }
-
-    await Post.findByIdAndDelete(req.params.id);
-    res.json({ message: "Post deleted" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.json(post.likes);
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
   }
 };
 
-// @desc    Like / Unlike a post
-export const likePost = async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: "Post not found" });
-
-    if (post.likes.includes(req.user.id)) {
-      // Unlike
-      post.likes = post.likes.filter(id => id.toString() !== req.user.id);
-    } else {
-      // Like
-      post.likes.push(req.user.id);
-    }
-
-    await post.save();
-    res.json(post);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+// Add more: comment, save, etc.
