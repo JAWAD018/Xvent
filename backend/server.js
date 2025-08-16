@@ -12,6 +12,7 @@ const postRoutes = require('./routes/posts');
 const eventRoutes = require('./routes/event');
 const profileRoutes = require('./routes/profiles');
 const notificationRoutes = require('./routes/notification');
+const authRoutes = require('./routes/authRoutes');
 
 // Load env vars
 dotenv.config();
@@ -40,6 +41,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/auth', authRoutes);
 
 // Socket.io for notifications
 io.on('connection', (socket) => {

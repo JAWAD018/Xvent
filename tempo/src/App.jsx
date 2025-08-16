@@ -407,8 +407,8 @@ const Register = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      // .post("/api/auth/register", formData)
-      .post("http://localhost:5000/api/auth/register", formData)
+      .post("/api/auth/register", formData)
+      // .post("http://localhost:5000/api/auth/register", formData)
       .then((res) => {
         // Redirect to login
         console.log(res);
