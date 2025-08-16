@@ -28,7 +28,8 @@ router.post('/register', async (req, res) => {
       token: generateToken(user._id)
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Register Error:', err); // Log error to console
+    res.status(500).json({ message: err.message, stack: err.stack });
   }
 });
 
