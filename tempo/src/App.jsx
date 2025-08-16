@@ -113,7 +113,7 @@ const Home = () => {
       <CreateEvent /> {/* Event creation button/form */}
       {Array.isArray(posts) &&
         posts.map((post) => (
-          <div key={post.id} className="bg-white p-4 rounded-lg mb-4 shadow">
+          <div key={post._id} className="bg-white p-4 rounded-lg mb-4 shadow">
             <p>
               {post.user} - {post.time}
             </p>
@@ -140,10 +140,15 @@ const CreatePost = () => {
     e.preventDefault();
     // Post to backend: FormData for image
     const formData = new FormData();
-    formData.append("description", description);
-    formData.append("image", image);
+    formData.append("text", description); // Backend expects 'text'
+    if (image) formData.append("image", image);
     axios
-      .post("/api/posts", formData)
+      .post("/api/posts", formData, {
+        headers: {
+          "x-auth-token": localStorage.getItem("token"),
+          "Content-Type": "multipart/form-data"
+        }
+      })
       .then((res) => console.log("Posted!", res))
       .catch((err) => console.error(err));
   };
@@ -204,9 +209,20 @@ const CreateEvent = () => {
     e.preventDefault();
     // Post to backend
     const data = new FormData();
-    Object.keys(formData).forEach((key) => data.append(key, formData[key]));
+    Object.keys(formData).forEach((key) => {
+      if (key === "banner" && formData[key]) {
+        data.append("banner", formData[key]);
+      } else {
+        data.append(key, formData[key]);
+      }
+    });
     axios
-      .post("/api/events", data)
+      .post("/api/events", data, {
+        headers: {
+          "x-auth-token": localStorage.getItem("token"),
+          "Content-Type": "multipart/form-data"
+        }
+      })
       .then((res) => console.log("Event Created!",res))
       .catch((err) => console.error(err));
   };
@@ -307,37 +323,76 @@ const CreateEvent = () => {
 // Profile Page (with followers/following)
 const Profile = () => {
   const [user, setUser] = React.useState({ followers: [], following: [] });
+  const [posts, setPosts] = React.useState([]);
+  const [events, setEvents] = React.useState([]);
 
   React.useEffect(() => {
-    // Fetch from backend
     axios
-      .get("/api/user/profile")
-      .then((res) => setUser(res.data))
+      .get("/api/profiles/", {
+        headers: {
+          "x-auth-token": localStorage.getItem("token"),
+        },
+      })
+      .then((res) => {
+        if (res.data && res.data.user) {
+          setUser(res.data.user);
+          setPosts(res.data.posts || []);
+          setEvents(res.data.events || []);
+        } else {
+          setUser(res.data);
+        }
+      })
       .catch((err) => console.error(err));
   }, []);
 
+  // Temporary cards if no posts/events
+  const tempPosts = [
+    { _id: '1', text: 'Welcome to Xvent! This is a sample post.', image: '', createdAt: new Date().toISOString() },
+  ];
+  const tempEvents = [
+    { _id: '1', title: 'Sample Event', date: new Date().toISOString(), venue: 'Hyderabad', banner: '', description: 'This is a sample event.' },
+  ];
+
   return (
-    <div className="mt-16 p-4">
-      <h2>Profile</h2>
+    <div className="mt-16 p-4 md:w-1/2 relative left-1/4">
+      <h2 className="text-2xl font-bold mb-2">Profile</h2>
       <img
-        src="profile-pic.jpg"
+        src={user.avatar || "profile-pic.jpg"}
         alt="Profile"
-        className="w-32 h-32 rounded-full"
+        className="w-32 h-32 rounded-full mb-2"
       />
-      <p>Username: {user.username}</p>
-      <h3>Followers ({user.followers.length})</h3>
-      <ul>
-        {user.followers.map((f) => (
-          <li key={f.id}>{f.name}</li>
+      <p className="text-lg font-semibold">Name: {user.name || user.username || "-"}</p>
+      <p className="text-md">Email: {user.email || "-"}</p>
+      <div className="flex gap-8 my-2">
+        <div>
+          <span className="font-bold">Followers:</span> {Array.isArray(user.followers) ? user.followers.length : 0}
+        </div>
+        <div>
+          <span className="font-bold">Following:</span> {Array.isArray(user.following) ? user.following.length : 0}
+        </div>
+      </div>
+      <h3 className="text-xl font-bold mt-6 mb-2">Posts</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {(posts.length ? posts : tempPosts).map((post) => (
+          <div key={post._id} className="bg-white p-4 rounded shadow">
+            <p className="font-semibold">{post.text}</p>
+            {post.image && <img src={post.image} alt="Post" className="w-full mt-2" />}
+            <p className="text-xs text-gray-500 mt-1">{new Date(post.createdAt).toLocaleString()}</p>
+          </div>
         ))}
-      </ul>
-      <h3>Following ({user.following.length})</h3>
-      <ul>
-        {user.following.map((f) => (
-          <li key={f.id}>{f.name}</li>
+      </div>
+      <h3 className="text-xl font-bold mt-6 mb-2">Events</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {(events.length ? events : tempEvents).map((event) => (
+          <div key={event._id} className="bg-white p-4 rounded shadow">
+            <p className="font-semibold">{event.title}</p>
+            {event.banner && <img src={event.banner} alt="Event" className="w-full mt-2" />}
+            <p className="text-xs text-gray-500 mt-1">{new Date(event.date).toLocaleString()}</p>
+            <p>{event.description}</p>
+            <p className="text-xs text-gray-400">Venue: {event.venue}</p>
+          </div>
         ))}
-      </ul>
-      {/* Add buttons to follow/unfollow, fetch posts/events by user */}
+      </div>
     </div>
   );
 };
@@ -350,7 +405,7 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:5000/api/auth/login", { email, password })
+      .post("/api/users/login", { email, password })
       .then((res) => {
         // Save token to localStorage, redirect to home
         localStorage.setItem("token", res.data.token);
@@ -398,7 +453,7 @@ const Register = () => {
   const [formData, setFormData] = React.useState({
     email: "",
     password: "",
-    username: "",
+    name: "",
   });
 
   const handleChange = (e) =>
@@ -423,8 +478,8 @@ const Register = () => {
       className="mt-16 p-4 max-w-md mx-auto bg-white shadow rounded"
     >
       <input
-        name="username"
-        placeholder="Username"
+        name="name"
+        placeholder="name"
         onChange={handleChange}
         className="w-full border p-2 mb-2"
         required

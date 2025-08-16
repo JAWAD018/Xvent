@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-const generateToken = require('../utils/generateToken');
+const { generateToken } = require('../utils/generateToken');
 
 // @route POST /api/auth/register
 router.post('/register', async (req, res) => {
-  const { username, email, password } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     let userExists = await User.findOne({ email });
@@ -16,14 +16,14 @@ router.post('/register', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
-      username,
+      name,
       email,
       password: hashedPassword
     });
 
     res.status(201).json({
       _id: user._id,
-      username: user.username,
+      name: user.name,
       email: user.email,
       token: generateToken(user._id)
     });
