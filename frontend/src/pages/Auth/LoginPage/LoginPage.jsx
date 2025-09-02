@@ -1,16 +1,59 @@
 import React from "react";
 import "./LoginPage.css";
 import XSmallLogo from "../../../assets/AuthAssets/XSmallLogo.png";
-import { IoCheckbox } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import RoundedBtnActive from "../../../components/Buttons/RoundedBtnActive/RoundedBtnActive";
-import GoogleLogo from "../../../assets/AuthAssets/GoogleLogo.svg"
-import AppleLogo from "../../../assets/AuthAssets/AppleLogo.svg"
+import GoogleLogo from "../../../assets/AuthAssets/GoogleLogo.svg";
+import AppleLogo from "../../../assets/AuthAssets/AppleLogo.svg";
+import axios from "axios";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { setAuthUser } from "../../../redux/authSlice";
+import { useState } from "react";
 
 const LoginPage = () => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
+
+
+ const [input, setInput] = useState({
+  username: "",
+  email: "",
+  password: "",
+});
+
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const changeEventHandler = (e) => {
+    setInput({ ...input, [e.target.name]: e.target.value });
   };
+
+ const loginHandler = async (e) => {
+  e.preventDefault();
+  try {
+    setLoading(true);
+    const res = await axios.post(
+      "http://localhost:8000/api/v1/user/login",
+      input,
+      {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      }
+    );
+
+    if (res.data.success) {
+      dispatch(setAuthUser(res.data.user));
+      navigate("/");
+      toast.success(res.data.message);
+      setInput({ username: "", email: "", password: "" });
+    }
+  } catch (error) {
+    toast.error(error?.response?.data?.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="LoginMainContainer">
@@ -27,7 +70,7 @@ const LoginPage = () => {
             </span>
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="loginForm">
+        <form onSubmit={loginHandler} className="loginForm">
           <div className="formGroup">
             <label htmlFor="email">Email</label>
             <input
@@ -36,6 +79,7 @@ const LoginPage = () => {
               name="email"
               placeholder="you@example.com"
               required
+              onChange={changeEventHandler}
             />
           </div>
 
@@ -47,6 +91,7 @@ const LoginPage = () => {
               name="password"
               placeholder="••••••••"
               required
+              onChange={changeEventHandler}
             />
           </div>
 
@@ -56,7 +101,7 @@ const LoginPage = () => {
             </Link>
           </div>
 
-          <div className="formOptions">
+          {/* <div className="formOptions">
             <label className="custom-checkbox">
               <input type="checkbox" required />
               <p className="checkmark"></p>
@@ -75,13 +120,25 @@ const LoginPage = () => {
                 </span>
               </p>
             </label>
-          </div>
-
-          <RoundedBtnActive
-            label={"Log in"}
-            type={"submit"}
-            className={"roundedPrimaryBtn"}
-          />
+          </div> */}
+          {loading ? (
+            <RoundedBtnActive
+              label={
+                <>
+                  <Loader2 className="animate-spin inline-block mr-2" /> Please
+                  Wait
+                </>
+              }
+              type="submit"
+              className="roundedPrimaryBtn"
+            />
+          ) : (
+            <RoundedBtnActive
+              label="Log in"
+              type="submit"
+              className="roundedPrimaryBtn"
+            />
+          )}
         </form>
         <div className="divider">
           <hr />
