@@ -1,100 +1,155 @@
-import React from "react";
-import "./SignupPage.css";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Loader2 } from "lucide-react";
 import XSmallLogo from "../../../assets/AuthAssets/XSmallLogo.png";
-import { IoCheckbox } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import GoogleLogo from "../../../assets/AuthAssets/GoogleLogo.svg";
+import AppleLogo from "../../../assets/AuthAssets/AppleLogo.svg";
 import RoundedBtnActive from "../../../components/Buttons/RoundedBtnActive/RoundedBtnActive";
-import GoogleLogo from "../../../assets/AuthAssets/GoogleLogo.svg"
-import AppleLogo from "../../../assets/AuthAssets/AppleLogo.svg"
 
 const SignupPage = () => {
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const [input, setInput] = useState({ username: "", email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [backendErrors, setBackendErrors] = useState({ username: "", email: "", password: "" });
+
+  const handleChange = (e) => {
+    setInput({ ...input, [e.target.name]: e.target.value });
+    setBackendErrors({ ...backendErrors, [e.target.name]: "" }); // clear fieldas eroR on change
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setBackendErrors({ username: "", email: "", password: "" }); // reset errors
+
+    // Client-side validation
+    if (!input.username || !input.email || !input.password) {
+      return alert("All fields are required"); 
+    }
+    if (input.password.length < 8) {
+      return setBackendErrors({ ...backendErrors, password: "Password must be at least 8 characters long" });
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await axios.post(
+        "http://localhost:8000/api/v1/user/register",
+        {
+          username: input.username.trim(),
+          email: input.email.trim(),
+          password: input.password,
+        },
+        { headers: { "Content-Type": "application/json" }, withCredentials: true }
+      );
+
+      if (res.data.success) {
+        alert(res.data.message);
+        setInput({ username: "", email: "", password: "" });
+        navigate("/signin");
+      }
+    } catch (err) {
+      console.error(err?.response?.data);
+      const msg = err?.response?.data?.message;
+
+      // Map backend message to field-specific error
+      if (msg.includes("Username")) setBackendErrors({ ...backendErrors, username: msg });
+      else if (msg.includes("Password")) setBackendErrors({ ...backendErrors, password: msg });
+      else if (msg.includes("email")) setBackendErrors({ ...backendErrors, email: "Email already exists" });
+      else setBackendErrors({ ...backendErrors, username: msg }); // fallback
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="LoginMainContainer">
-      <div className="LoginPageContainer SignupPageContainer">
-        <div className="LoginPageUpperSection">
-          <img src={XSmallLogo} alt="Xvent Logo" />
-          <h2>Login your account</h2>
-          <p>
+    <div className="min-h-screen flex items-center justify-center bg-[#faf9f2] p-4">
+      <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-lg flex flex-col space-y-4">
+
+        {/* Header */}
+        <div className="flex flex-col items-center space-y-2">
+          <img src={XSmallLogo} alt="Logo" className="h-14 w-8 object-contain" />
+          <h2 className="text-2xl font-medium text-gray-800 text-center">Create your account</h2>
+          <p className="text-sm text-center text-gray-500">
             Already have an account?{" "}
-            <span>
-              <Link className="signupPageLink" to="/signin">
-                Log in
-              </Link>
-            </span>
+            <Link to="/signin" className="font-semibold underline text-gray-700">Log in</Link>
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="loginForm signupForm">
-          <div className="formGroup">
-            <label htmlFor="email">Full Name</label>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+
+          {/* Username */}
+          <div className="flex flex-col">
+            <label htmlFor="username" className="text-sm font-medium mb-1 text-gray-500">Username</label>
             <input
               type="text"
-              id="name"
-              name="name"
-              placeholder="Full Name"
-              required
+              id="username"
+              name="username"
+              placeholder="Username"
+              value={input.username}
+              onChange={handleChange}
+              className="h-14 px-4 rounded-xl border focus:outline-none focus:ring-2 transition"
+              style={{ borderColor: backendErrors.username ? "red" : "rgba(102, 102, 102, 0.35)" }}
             />
+            {backendErrors.username && <p className="text-red-600 text-sm mt-1">{backendErrors.username}</p>}
           </div>
 
-          <div className="formGroup">
-            <label htmlFor="email">Email</label>
+          {/* Email */}
+          <div className="flex flex-col">
+            <label htmlFor="email" className="text-sm font-medium mb-1 text-gray-500">Email</label>
             <input
               type="email"
               id="email"
               name="email"
               placeholder="you@example.com"
-              required
+              value={input.email}
+              onChange={handleChange}
+              className="h-14 px-4 rounded-xl border focus:outline-none focus:ring-2 transition"
+              style={{ borderColor: backendErrors.email ? "red" : "rgba(102, 102, 102, 0.35)" }}
             />
+            {backendErrors.email && <p className="text-red-600 text-sm mt-1">{backendErrors.email}</p>}
           </div>
 
-          <div className="formGroup">
-            <label htmlFor="password">Password</label>
+          {/* Password */}
+          <div className="flex flex-col">
+            <label htmlFor="password" className="text-sm font-medium mb-1 text-gray-500">Password</label>
             <input
               type="password"
               id="password"
               name="password"
               placeholder="••••••••"
-              required
+              value={input.password}
+              onChange={handleChange}
+              className="h-14 px-4 rounded-xl border focus:outline-none focus:ring-2 transition"
+              style={{ borderColor: backendErrors.password ? "red" : "rgba(102, 102, 102, 0.35)" }}
             />
+            {backendErrors.password && <p className="text-red-600 text-sm mt-1">{backendErrors.password}</p>}
           </div>
 
-          {/* <div className="formForgetPassword">
-            <Link to="">
-              <p>Forget your password</p>
-            </Link>
-          </div> */}
+          {/* Terms */}
+          <label className="flex items-start space-x-2 text-sm text-gray-500">
+            <input type="checkbox" required className="mt-1" style={{ accentColor: "#111111" }} />
+            <span>
+              By creating an account, I agree to our{" "}
+              <Link to="/terms-of-service" className="underline font-medium text-gray-700">Terms of use</Link>{" "}
+              and{" "}
+              <Link to="/privacy-policy" className="underline font-medium text-gray-700">Privacy Policy</Link>
+            </span>
+          </label>
 
-          <div className="formOptions">
-            <label className="custom-checkbox">
-              <input type="checkbox" required />
-              <p className="checkmark"></p>
-              <p className="checkmarkPara">
-                By creating an account, I agree to our{" "}
-                <span>
-                  <Link className="signupPageLink" to="/terms-of-service">
-                    Terms of use
-                  </Link>
-                </span>{" "}
-                and{" "}
-                <span>
-                  <Link className="signupPageLink" to="/privacy-policy">
-                    Privacy Policy
-                  </Link>
-                </span>
-              </p>
-            </label>
-          </div>
-
-          <RoundedBtnActive
-            label={"Sign up"}
-            type={"submit"}
-            className={"roundedPrimaryBtn"}
-          />
+          {/* Signup Button */}
+          <button
+            type="submit"
+            className="h-14 w-full rounded-xl flex items-center justify-center font-semibold transition disabled:opacity-50"
+            style={{ backgroundColor: "#e6684f", color: "white" }}
+            disabled={loading}
+          >
+            {loading && <Loader2 className="animate-spin h-5 w-5 mr-2" />}
+            {loading ? "Please Wait" : "Sign Up"}
+          </button>
         </form>
-        <div className="divider">
+         <div className="divider">
           <hr />
           <p>OR</p>
           <hr />
