@@ -9,16 +9,34 @@ import { Event } from "../models/event.model.js";
 export const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    if ((!username || !email, !password)) {
+
+    // Password should be greater than 8 char
+     if (password.length < 8) {
+      return res.status(400).json({
+        message: "Password must be at least 8 characters long",
+        success: false,
+      });
+    }
+    if ((!username || !email || !password)) {
+      
       return res.status(401).json({
         message: "Fill all the field",
+        success: false,
+      });
+    }
+
+    // Chekc User name is exist or not so everyone should have unique username 
+     const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.status(409).json({
+        message: "Username already taken",
         success: false,
       });
     }
     const user = await User.findOne({ email });
     if (user) {
       return res.status(401).json({
-        message: "Email already registered",
+        message: "Invalid credentials", // Other people should not know that this email is exist
         success: false,
       });
     }

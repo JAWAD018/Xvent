@@ -12,6 +12,9 @@ import TermsOfService from "./pages/TermsOfService/TermsOfService";
 import NotFound from "./pages/NotFound/NotFound";
 import SignIn from "./pages/Auth/LoginPage/LoginPage";
 import SignUp from "./pages/Auth/Signuppage/SignupPage";
+import LoginPage from "./pages/Auth/LoginPage/LoginPage";
+import SignupPage from "./pages/Auth/Signuppage/SignupPage";
+import Dashbord from "./pages/Dashbord";
 
 
 const WithLayout = ({ children }) => (
@@ -59,9 +62,9 @@ function App() {
           }
         />
 
-
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
+        <Route path="/dashboard" element={<Dashbord />} />  
+        <Route path="/signin" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
       </Routes>
     </Router>
   );

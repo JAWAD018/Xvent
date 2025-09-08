@@ -14,46 +14,43 @@ import { useState } from "react";
 
 const LoginPage = () => {
 
-
- const [input, setInput] = useState({
-  username: "",
-  email: "",
-  password: "",
-});
-
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [input, setInput] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const changeEventHandler = (e) => {
+  const handleChange = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
+    setError(""); // Clear previous error
   };
 
- const loginHandler = async (e) => {
-  e.preventDefault();
-  try {
-    setLoading(true);
-    const res = await axios.post(
-      "http://localhost:8000/api/v1/user/login",
-      input,
-      {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      }
-    );
+  const loginHandler = async (e) => {
+    e.preventDefault();
+    setError("");
 
-    if (res.data.success) {
-      dispatch(setAuthUser(res.data.user));
-      navigate("/");
-      toast.success(res.data.message);
-      setInput({ username: "", email: "", password: "" });
+    try {
+      setLoading(true);
+
+      const res = await axios.post(
+        "http://localhost:8000/api/v1/user/login",
+        input,
+        { headers: { "Content-Type": "application/json" }, withCredentials: true }
+      );
+
+      if (res.data.success) {
+        dispatch(setAuthUser(res.data.user));
+        toast.success(res.data.message);
+        setInput({ email: "", password: "" });
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      console.error(err?.response?.data);
+      setError(err?.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    toast.error(error?.response?.data?.message || "Something went wrong");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="LoginMainContainer">
@@ -70,6 +67,12 @@ const LoginPage = () => {
             </span>
           </p>
         </div>
+          {/* Error */}
+        {error && (
+          <div className="text-red-500 p-2 rounded text-lg mb-4">
+            {error}
+          </div>
+        )}
         <form onSubmit={loginHandler} className="loginForm">
           <div className="formGroup">
             <label htmlFor="email">Email</label>
@@ -79,7 +82,7 @@ const LoginPage = () => {
               name="email"
               placeholder="you@example.com"
               required
-              onChange={changeEventHandler}
+              onChange={handleChange}
             />
           </div>
 
@@ -91,7 +94,7 @@ const LoginPage = () => {
               name="password"
               placeholder="••••••••"
               required
-              onChange={changeEventHandler}
+              onChange={handleChange}
             />
           </div>
 
