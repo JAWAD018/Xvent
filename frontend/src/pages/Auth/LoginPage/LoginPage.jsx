@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import "./LoginPage.css";
 import XSmallLogo from "../../../assets/AuthAssets/XSmallLogo.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,56 +8,70 @@ import AppleLogo from "../../../assets/AuthAssets/AppleLogo.svg";
 import axios from "axios";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { useDispatch } from "react-redux";
-import { setAuthUser } from "../../../redux/authSlice";
-import { useState } from "react";
+import { UserContext } from "../../../context/UserContext";
+import { useUser } from "../../../context/UserContext";
+
 
 const LoginPage = () => {
-
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const { setUser } = useContext(UserContext);
+  
   const [input, setInput] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+  
+  const { currentUser, setCurrentUser, UserLoading } = useUser();
+  // Handle input change
   const handleChange = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
-    setError(""); // Clear previous error
+    setError(""); // clear error on change
   };
 
-  const loginHandler = async (e) => {
-    e.preventDefault();
-    setError("");
+  // Login handler
+ const loginHandler = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    try {
-      setLoading(true);
+  if (!input.email || !input.password) {
+    setError("Please enter both email and password");
+    return;
+  }
 
-      const res = await axios.post(
-        "http://localhost:8000/api/v1/user/login",
-        input,
-        { headers: { "Content-Type": "application/json" }, withCredentials: true }
-      );
+  try {
+    setLoading(true);
+    const { data } = await axios.post(
+      "http://localhost:8000/api/v1/user/login",
+      input,
+      { headers: { "Content-Type": "application/json" }, withCredentials: true }
+    );
 
-      if (res.data.success) {
-        dispatch(setAuthUser(res.data.user));
-        toast.success(res.data.message);
-        setInput({ email: "", password: "" });
-        navigate("/dashboard");
-      }
-    } catch (err) {
-      console.error(err?.response?.data);
-      setError(err?.response?.data?.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+if (data.success) {
+  const { user, token } = data;
+  // attach token to user object
+  const userWithToken = { ...user, token };
+
+  setCurrentUser(userWithToken);
+  localStorage.setItem("user", JSON.stringify(userWithToken));
+
+  toast.success(data.message);
+  navigate("/dashboard");
+}
+
+  } catch (err) {
+    console.error(err?.response?.data || err);
+    setError(err?.response?.data?.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="LoginMainContainer">
       <div className="LoginPageContainer">
+        {/* Upper Section */}
         <div className="LoginPageUpperSection">
           <img src={XSmallLogo} alt="Xvent Logo" />
-          <h2>Login your account</h2>
+          <h2>Login to your account</h2>
           <p>
             Don't have an account?{" "}
             <span>
@@ -67,12 +81,13 @@ const LoginPage = () => {
             </span>
           </p>
         </div>
-          {/* Error */}
+
+        {/* Error message */}
         {error && (
-          <div className="text-red-500 p-2 rounded text-lg mb-4">
-            {error}
-          </div>
+          <div className="text-red-500 p-2 rounded text-lg mb-4">{error}</div>
         )}
+
+        {/* Login Form */}
         <form onSubmit={loginHandler} className="loginForm">
           <div className="formGroup">
             <label htmlFor="email">Email</label>
@@ -81,8 +96,10 @@ const LoginPage = () => {
               id="email"
               name="email"
               placeholder="you@example.com"
-              required
+              value={input.email}
               onChange={handleChange}
+              disabled={loading}
+              required
             />
           </div>
 
@@ -93,75 +110,58 @@ const LoginPage = () => {
               id="password"
               name="password"
               placeholder="••••••••"
-              required
+              value={input.password}
               onChange={handleChange}
+              disabled={loading}
+              required
             />
           </div>
 
           <div className="formForgetPassword">
-            <Link to="">
-              <p>Forget your password</p>
+            <Link to="/forgot-password">
+              <p>Forgot your password?</p>
             </Link>
           </div>
 
-          {/* <div className="formOptions">
-            <label className="custom-checkbox">
-              <input type="checkbox" required />
-              <p className="checkmark"></p>
-              <p className="checkmarkPara">
-                By creating an account, I agree to our{" "}
-                <span>
-                  <Link className="signupPageLink" to="/terms-of-service">
-                    Terms of use
-                  </Link>
-                </span>{" "}
-                and{" "}
-                <span>
-                  <Link className="signupPageLink" to="/privacy-policy">
-                    Privacy Policy
-                  </Link>
-                </span>
-              </p>
-            </label>
-          </div> */}
-          {loading ? (
-            <RoundedBtnActive
-              label={
+          {/* Submit Button */}
+          <RoundedBtnActive
+            type="submit"
+            className="roundedPrimaryBtn"
+            label={
+              loading ? (
                 <>
-                  <Loader2 className="animate-spin inline-block mr-2" /> Please
-                  Wait
+                  <Loader2 className="animate-spin inline-block mr-2" /> Please Wait
                 </>
-              }
-              type="submit"
-              className="roundedPrimaryBtn"
-            />
-          ) : (
-            <RoundedBtnActive
-              label="Log in"
-              type="submit"
-              className="roundedPrimaryBtn"
-            />
-          )}
+              ) : (
+                "Log in"
+              )
+            }
+            disabled={loading}
+          />
         </form>
+
+        {/* Divider */}
         <div className="divider">
           <hr />
           <p>OR</p>
           <hr />
         </div>
+
+        {/* OAuth Buttons */}
         <div className="oauthButtons">
           <RoundedBtnActive
-            label={"Continue with Google"}
-            type={"submit"}
-            className={"roundedSecondaryBtn"}
-            img={true}
+            label="Continue with Google"
+            type="button"
+            className="roundedSecondaryBtn"
+            img
             imgSrc={GoogleLogo}
             imgAlt="Google Logo"
           />
           <RoundedBtnActive
-            label={"Continue with Apple"}
-            type={"submit"}
-            className={"roundedSecondaryBtn"}
-            img={true}
+            label="Continue with Apple"
+            type="button"
+            className="roundedSecondaryBtn"
+            img
             imgSrc={AppleLogo}
             imgAlt="Apple Logo"
           />
