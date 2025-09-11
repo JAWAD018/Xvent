@@ -36,7 +36,7 @@ app.use(cors(corsOption));
 
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/post", postRoute);
-app.use("/api/v1/post", eventRoute);
+app.use("/api/v1/event", eventRoute);
 // app.use("/api/v1/message", messageRoute);
 // "http://localhost:8000/api/v1/user"
 

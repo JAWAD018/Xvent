@@ -77,8 +77,10 @@ export const addNewEvent = async (req, res) => {
 export const getAllEvents = async (req, res) => {
   try {
     const events = await Event.find()
-      .sort({ createdAt: -1 })
-      .populate({ path: "author", select: "username profilePicture" });
+  .sort({ createdAt: -1 })
+  .populate({ path: "author", select: "username profilePicture" })
+  .populate({ path: "comments.user", select: "username profilePicture" }); // <-- add this
+
 
     return res.status(200).json({ success: true, events });
   } catch (error) {
@@ -208,14 +210,17 @@ export const addCommentToEvent = async (req, res) => {
     event.comments.push(comment);
     await event.save();
 
+    // Populate only the last added comment
     await event.populate({
       path: "comments.user",
       select: "username profilePicture",
     });
 
+    const newComment = event.comments[event.comments.length - 1];
+
     return res.status(201).json({
       message: "Comment Added",
-      comments: event.comments,
+      comment: newComment, // ✅ only send the new comment
       success: true,
     });
   } catch (error) {

@@ -2,6 +2,8 @@ import express from "express";
 import {
   editProfile,
   followorUnfollow,
+  getAllUsers,
+  getMyProfile,
   getProfile,
   getSuggestedUsers,
   login,
@@ -22,6 +24,8 @@ router
   .post(isAuthenticated, upload.single("profilePicture"), editProfile);
 router.route("/suggested").get(isAuthenticated, getSuggestedUsers);
 router.route("/followorunfollow/:id").post(isAuthenticated, followorUnfollow);
+router.route("/all").get(getAllUsers);
+router.route("/me").get(isAuthenticated, getMyProfile);
 
 
 

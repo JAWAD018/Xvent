@@ -6,6 +6,26 @@ import cloudinary from "../utils/cloudinary.js";
 import { Post } from "../models/post.model.js";
 import { Event } from "../models/event.model.js";
 
+
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("_id username email profilePicture");
+    // Only sending safe fields, no password
+    return res.status(200).json({
+      success: true,
+      count: users.length,
+      users,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
 export const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -83,27 +103,26 @@ export const login = async (req, res) => {
       expiresIn: "1d",
     });
 
-    // populate each post if in the posts array
-    const populatedPosts = await Promise.all(
-      user.posts.map(async (postId) => {
-        const post = await Post.findById(postId);
-        if (post.author.equals(user._id)) {
-          return post;
-        }
-        return null;
-      })
-    );
+  const populatedPosts = await Promise.all(
+  user.posts.map(async (postId) => {
+    const post = await Post.findById(postId);
+    if (post && post.author && post.author.equals(user._id)) {
+      return post;
+    }
+    return null;
+  })
+);
 
-    // Populate events created by the user
-    const populatedEvents = await Promise.all(
-      user.events.map(async (eventId) => {
-        const event = await Event.findById(eventId);
-        if (event && event.author.equals(user._id)) {
-          return event;
-        }
-        return null;
-      })
-    );
+const populatedEvents = await Promise.all(
+  user.events.map(async (eventId) => {
+    const event = await Event.findById(eventId);
+    if (event && event.author && event.author.equals(user._id)) {
+      return event;
+    }
+    return null;
+  })
+);
+
 
     user = {
       _id: user._id,
@@ -126,6 +145,7 @@ export const login = async (req, res) => {
         message: `Welcome back ${user.username}`,
         success: true,
         user,
+        token
       });
   } catch (error) {
     console.log(error);
@@ -147,15 +167,77 @@ export const logout = async (_, res) => {
 export const getProfile = async (req, res) => {
   try {
     const userId = req.params.id;
+
+    // find user without password
     let user = await User.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // populate posts
+    const posts = await Post.find({ author: userId });
+    // populate events
+    const events = await Event.find({ author: userId });
+
     return res.status(200).json({
-      user,
       success: true,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        gender: user.gender,
+        profilePicture: user.profilePicture,
+        followers: user.followers,
+        following: user.following,
+        posts,
+        events,
+      },
     });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+
+export const getMyProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.id).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Populate posts
+    const posts = await Post.find({ author: req.id });
+    const events = await Event.find({ author: req.id });
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        gender: user.gender,
+        profilePicture: user.profilePicture,
+        followers: user.followers,
+        following: user.following,
+        posts,
+        events,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
 
 export const editProfile = async (req, res) => {
   try {
