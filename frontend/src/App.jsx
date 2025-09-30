@@ -22,6 +22,9 @@ import MyPosts from "./components/Post/MyPosts";
 import UpdatePost from "./components/Post/UpdatedPost";
 import AddEventPost from "./EventPost/AddEventPost";
 import EventsPage from "./EventPost/EventsPage";
+import DiscoverEvents from "./pages/DiscoverEvents";
+import BookmarksPage from "./pages/BookmarksPage";
+import EventDetails from "./components/EventDetails";
 
 function App() {
   return (
@@ -33,9 +36,12 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/privacy-policy" element={<Legal />} />
             <Route path="/add-post" element={<AddPost />} />
+            <Route path="/discover" element={<DiscoverEvents />} />
+            <Route path="/bookmark" element={<BookmarksPage />} />
             <Route path="/my-post" element={<MyPosts />} />
             <Route path="/add-event" element={<AddEventPost />} />
             <Route path="/events" element={<EventsPage />} />
+            <Route path="/event/:id" element={<EventDetails />} />
             <Route path="/post/updated/:id" element={<UpdatePost />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/dashboard" element={<Dashboard />} />

@@ -1,7 +1,6 @@
 import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import XventLogo from "../../assets/HomePageUtils/XventLogo.png";
-import { IoMdAddCircleOutline } from "react-icons/io";
 import { 
   Home, 
   User, 
@@ -32,47 +31,59 @@ const NavbarLoggedIn = () => {
   const Navlinks = [
     { NavTitle: "Home", link: "/dashboard", icon: Home },
     { NavTitle: "Profile", link: "/profile/me", icon: User },
+    { NavTitle: "Discover Events", link: "/discover", icon: User },
+    { NavTitle: "Bookmarks", link: "/bookmark", icon: User },
+
     { NavTitle: "My Posts", link: "/my-post", icon: FileText },
     { NavTitle: "Events", link: "/events", icon: Calendar },
     { NavTitle: "Help", link: "/help", icon: HelpCircle },
     { NavTitle: "Settings", link: "/settings", icon: Settings },
   ];
+  const MobileNavlinks = [
+    { NavTitle: "Home", link: "/dashboard", icon: Home },
+    { NavTitle: "Discover Events", link: "/discover", icon: User },
+    { NavTitle: "Bookmarks", link: "/bookmark", icon: User },
+    { NavTitle: "My Posts", link: "/my-post", icon: FileText },
+    { NavTitle: "Events", link: "/events", icon: Calendar },
+  ];
 
   return (
-    <aside className="flex flex-col w-64 h-screen bg-[#FAF9F2] border-r border-gray-200 shadow-sm fixed z-50">
-      {/* Logo */}
-      <div className="flex items-center justify-center h-20 border-none mb-5 px-4">
-        <Link to="/dashboard">
-          <img src={XventLogo} alt="Xvent Logo" className="h-12" />
-        </Link>
-      </div>
-
-      {/* Nav Links */}
-      <nav className="flex-1 px-4 py-6">
-        <div className="space-y-2">
-          {Navlinks.map((link, index) => {
-            const isActive = location.pathname === link.link;
-            return (
-              <Link
-                key={index}
-                to={link.link}
-                className={`flex items-center space-x-3 p-4 rounded-xl text-sm font-medium transition-colors ${
-                  isActive ? "bg-gray-900 text-[#F0EFE9]" : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                <link.icon className="w-5 h-5" />
-                <span>{link.NavTitle}</span>
-              </Link>
-            );
-          })}
+    <>
+      {/* Desktop Sidebar */}
+      <aside className="hidden sm:flex flex-col w-64 h-screen bg-[#FAF9F2] border-r border-gray-200 shadow-sm fixed z-40">
+        {/* Logo */}
+        <div className="flex items-center justify-center h-20 mb-5 px-4">
+          <Link to="/dashboard">
+            <img src={XventLogo} alt="Xvent Logo" className="h-12" />
+          </Link>
         </div>
-      </nav>
 
-      {/* Profile + Logout */}
-      <div className="px-4 py-6 border-t">
-        {/* User Profile */}
-        <div className="bg-gray-50 rounded-lg p-3 mb-4">
-          <div className="flex items-center space-x-3">
+        {/* Nav Links */}
+        <nav className="flex-1 px-4 py-6">
+          <div className="space-y-2">
+            {Navlinks.map((link, index) => {
+              const isActive = location.pathname === link.link;
+              return (
+                <Link
+                  key={index}
+                  to={link.link}
+                  className={`flex items-center space-x-3 p-4 rounded-xl text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-gray-900 text-[#F0EFE9]"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <link.icon className="w-5 h-5" />
+                  <span>{link.NavTitle}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+
+        {/* Profile + Logout */}
+        <div className="px-4 py-6 border-t">
+          <div className="bg-gray-50 rounded-lg p-3 mb-4 flex items-center space-x-3">
             {currentUser?.profilePicture ? (
               <img
                 src={currentUser.profilePicture}
@@ -93,18 +104,36 @@ const NavbarLoggedIn = () => {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Logout Button */}
-        <button
-          onClick={handleLogout}
-          className="flex items-center justify-center space-x-2 w-full px-4 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors font-medium"
-        >
-          <LogOut className="w-4 h-4" />
-          <span>Logout</span>
-        </button>
-      </div>
-    </aside>
+          <button
+            onClick={handleLogout}
+            className="flex items-center justify-center space-x-2 w-full px-4 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors font-medium"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Logout</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Mobile Bottom Nav */}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-md flex justify-around items-center h-14 z-50">
+        {MobileNavlinks.map((link, index) => {
+          const isActive = location.pathname === link.link;
+          return (
+            <Link
+              key={index}
+              to={link.link}
+              className={`flex flex-col items-center justify-center text-xs ${
+                isActive ? "text-blue-600" : "text-gray-500"
+              }`}
+            >
+              <link.icon className="w-5 h-5 mb-0.5" />
+              <span className="text-[10px]">{link.NavTitle}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    </>
   );
 };
 

@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import NavbarDesktop from "../components/Navbar/NavbarDesktop";
 import NavbarLoggedIn from "../components/Navbar/NavbarLoggedIn";
-import { Search, MapPin } from "lucide-react";
+import { Search, MapPin, LogOut } from "lucide-react";
 import axios from "axios";
+import HeaderProfileMenu from "../components/HeaderProfileMenu";
 
 const MainLayout = () => {
-  const { currentUser } = useUser();
+   const { currentUser, setCurrentUser } = useUser();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+   
 
  useEffect(() => {
   if (!currentUser) return;
@@ -46,6 +49,17 @@ const MainLayout = () => {
       </div>
     );
   }
+
+// LogOut
+  const handleLogout = async () => {
+    try {
+      await axios.get("http://localhost:8000/api/v1/user/logout", { withCredentials: true });
+      setCurrentUser(null);
+      navigate("/signin");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   // Process Top Events check login #Jawad find errors logic is weak
 const topEvents = [...(events || [])]
@@ -90,31 +104,40 @@ const topEvents = [...(events || [])]
     <div className="min-h-screen bg-[#FAF9F2]">
       {currentUser && <NavbarLoggedIn />}
 
-      <div className={`${currentUser ? "ml-64" : ""} min-h-screen`}>
-        {currentUser && (
-          <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-            <div className="px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center h-16">
-                <div className="flex items-center space-x-4 flex-1 max-w-md">
-                  <div className="flex items-center text-gray-600">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    <span className="text-sm">Hyderabad</span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                      <input
-                        type="text"
-                        placeholder="Search events..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-                </div>
+      <div className={`${currentUser ? "lg-64" : ""} min-h-screen`}>
+  {currentUser && (
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <div className="px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          
+          {/* Left: Location + Search */}
+          <div className="flex items-center space-x-4 flex-1 max-w-md">
+            <div className="flex items-center text-gray-600">
+              <MapPin className="w-4 h-4 mr-1" />
+              <span className="text-sm">Hyderabad</span>
+            </div>
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search events..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
               </div>
             </div>
-          </header>
-        )}
+          </div>
+
+          {/* Right: Profile + Logout */}
+          <div className="flex items-center space-x-4 ml-4">
+           <HeaderProfileMenu />
+          </div>
+
+        </div>
+      </div>
+    </header>
+  )}
+
 
         {!currentUser && <NavbarDesktop />}
 

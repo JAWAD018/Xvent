@@ -355,3 +355,48 @@ export const followorUnfollow = async (req, res) => {
     console.log(error);
   }
 };
+export const bookmarks = async (req, res) => {
+  try {
+    const userId = req.id;
+    const eventId = req.params.postId; // better rename to eventId for clarity
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    const event = await Event.findById(eventId);
+    if (!event) return res.status(404).json({ success: false, message: "Event not found" });
+
+    // Toggle bookmark
+    const isBookmarked = user.bookmarks.includes(eventId);
+    if (isBookmarked) {
+      user.bookmarks.pull(eventId);
+      await user.save();
+      return res.json({ success: true, message: "Bookmark removed" });
+    } else {
+      user.bookmarks.push(eventId);
+      await user.save();
+      return res.json({ success: true, message: "Bookmarked successfully" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+
+
+export const getBookmarks = async (req, res) => {
+  try {
+    const user = await User.findById(req.id).populate("bookmarks");
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    return res.status(200).json({
+      success: true,
+      bookmarks: user.bookmarks,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
