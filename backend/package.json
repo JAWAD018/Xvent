@@ -4,7 +4,8 @@
   "description": "This document summarizes the findings of the backend review for the xVent project.",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+     "start" : "node index.js"
   },
   "keywords": [],
   "author": "",

@@ -5,42 +5,50 @@ import dotenv from "dotenv";
 import connectDB from "./utils/db.js";
 import userRoute from "./routes/user.route.js";
 import postRoute from "./routes/post.route.js";
-import eventRoute from "./routes/event.route.js"
+import eventRoute from "./routes/event.route.js";
 // import messageRoute from "./routes/message.route.js";
 
-dotenv.config({});
+dotenv.config();
 
 const app = express();
 
+//  Connect to MongoDB first
+connectDB();
+
 const PORT = process.env.PORT || 3000;
-console.log(PORT);
 
-app.get("/", (req, res) => {
-  return res.status(200).json({
-    message: "I'm running from server side",
-    suceess: true,
-  });
-});
+//  CORS configuration
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://xvent.vercel.app",       // your deployed frontend
+  "https://xvent.onrender.com"      // (optional) same-origin calls
+];
 
-// middlewares
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+
+// Middleware setup
 app.use(express.json());
 app.use(cookieParser());
 app.use(urlencoded({ extended: true }));
-const corsOption = {
-  origin: ["http://localhost:5173", "http://localhost:5174"], // allow both
-  credentials: true, // lowercase + required
-};
-app.use(cors(corsOption));
 
-// api routes
+// Health check route
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "Server is running successfully",
+    success: true,
+  });
+});
 
+//  API routes
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/post", postRoute);
 app.use("/api/v1/event", eventRoute);
 // app.use("/api/v1/message", messageRoute);
-// "http://localhost:8000/api/v1/user"
 
 app.listen(PORT, () => {
-  connectDB();
-  console.log(`port is running on ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
