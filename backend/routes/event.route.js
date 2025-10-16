@@ -11,6 +11,7 @@ import {
   getCommentsOfEvent,
   deleteEvent,
   bookmarkEvent,
+  getEventById,
 } from "../controllers/event.controller.js";
 
 const router = express.Router();
@@ -25,5 +26,6 @@ router.route("/:id/comment").post(isAuthenticated, addCommentToEvent);
 router.route("/:id/comment/all").get(isAuthenticated, getCommentsOfEvent);
 router.route("/:id/delete").delete(isAuthenticated, deleteEvent);
 router.route("/:id/bookmark").post(isAuthenticated, bookmarkEvent);
+router.route("/:id").get(isAuthenticated, getEventById)
 
 export default router;

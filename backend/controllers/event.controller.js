@@ -286,3 +286,19 @@ export const bookmarkEvent = async (req, res) => {
     console.log(error);
   }
 };
+
+export const getEventById = async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const event = await Event.findById(eventId);
+
+    if (!event) {
+      return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    return res.status(200).json({ success: true, event });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: "Server Error" });
+  }
+};

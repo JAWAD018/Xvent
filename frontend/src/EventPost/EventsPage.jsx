@@ -96,7 +96,7 @@ const EventsPage = () => {
   if (loading) return <div className="p-6 text-center">Loading events...</div>;
 
   return (
-    <div className="p-8 max-w-8xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    <div className="p-8 max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {events.map((event) => {
         const isLiked = event.likes?.includes(currentUserId);
 

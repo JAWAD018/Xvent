@@ -1,8 +1,10 @@
 import express from "express";
 import {
+  bookmarks,
   editProfile,
   followorUnfollow,
   getAllUsers,
+  getBookmarks,
   getMyProfile,
   getProfile,
   getSuggestedUsers,
@@ -27,7 +29,7 @@ router.route("/followorunfollow/:id").post(isAuthenticated, followorUnfollow);
 router.route("/all").get(getAllUsers);
 router.route("/me").get(isAuthenticated, getMyProfile);
 
-
-
+router.post("/bookmark/:postId", isAuthenticated, bookmarks);
+router.get("/bookmarks", isAuthenticated, getBookmarks)
 
 export default router;

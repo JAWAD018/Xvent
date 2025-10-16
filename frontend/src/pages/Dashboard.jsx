@@ -115,6 +115,10 @@ const Dashboard = () => {
 
     try {
       setEventLoading(true);
+       const tagsArray = tags
+      .split(",")         
+      .map((tag) => tag.trim()) 
+      .filter((tag) => tag.length > 0); 
 
       const formData = new FormData();
       formData.append("title", title);
@@ -125,7 +129,7 @@ const Dashboard = () => {
       formData.append("time", time);
       formData.append("category", category);
       formData.append("type", type);
-      formData.append("tags", tags);
+       tagsArray.forEach((tag) => formData.append("tags[]", tag));  
       formData.append("registrationLink", registrationLink);
       formData.append("image", eventImage);
 
@@ -226,7 +230,7 @@ const Dashboard = () => {
                   e.target.style.height = e.target.scrollHeight + "px";
                 }}
                 placeholder="Let others know what's going on..."
-                  className="w-full flex-1 resize-none border-b border-gray-300 p-5 focus:border-black focus:ring-0 focus:outline-none overflow-hidden"
+                  className="w-full flex-1 resize-none border-b border-gray-300 px-1 py-1 focus:border-black focus:ring-0 focus:outline-none overflow-hidden"
   rows={1}
               />
               <div className="flex justify-between items-center">
@@ -381,7 +385,7 @@ const Dashboard = () => {
 
       )}
 
-      {/* ---------- FEED ---------- */}
+   {/* Feed Strts */}
       {loading && <p className="text-center text-gray-500">Loading posts...</p>}
       {!loading && posts.length === 0 && <p className="text-center text-gray-500">No posts available yet.</p>}
 
