@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Bookmark, CalendarDays, MapPin, Heart } from "lucide-react";
-import { useUser } from "../context/UserContext";
+import { useUser } from "../Context/UserContext";
 import { toast } from "sonner";
 
 const api = axios.create({
