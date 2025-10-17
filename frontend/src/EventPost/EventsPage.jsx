@@ -5,7 +5,7 @@ import { useUser } from "../context/UserContext";
 import { toast } from "sonner";
 
 const api = axios.create({
-  baseURL: "http://localhost:8000/api/v1",
+  baseURL: "https://xvent.onrender.com/api/v1",
   withCredentials: true,
 });
 
