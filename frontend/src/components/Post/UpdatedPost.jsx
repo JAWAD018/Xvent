@@ -15,7 +15,7 @@ const UpdatePost = () => {
     // fetch existing post data
     const fetchPost = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:8000/api/v1/post/${id}`, {
+        const { data } = await axios.get(`https://xvent.onrender.com/api/v1/post/${id}`, {
   withCredentials: true,
 });
 
