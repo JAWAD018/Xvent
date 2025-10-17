@@ -21,7 +21,7 @@ const EventDetails = () => {
   const fetchEvent = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`http://localhost:8000/api/v1/event/${id}`, {
+      const { data } = await axios.get(`https://xvent.onrender.com/api/v1/event/${id}`, {
         withCredentials: true,
       });
       setEvent(data.event);
@@ -35,7 +35,7 @@ const EventDetails = () => {
 
   const checkBookmark = async () => {
     try {
-      const { data } = await axios.get("http://localhost:8000/api/v1/user/bookmarks", {
+      const { data } = await axios.get("https://xvent.onrender.com/api/v1/user/bookmarks", {
         withCredentials: true,
       });
       setIsBookmarked(data.bookmarks.some((b) => (b._id || b) === id));
