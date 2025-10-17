@@ -15,7 +15,7 @@ const PostCard = ({ post, currentUserId, handleLikeToggle, handleShare }) => {
     if (!currentUserId) return toast.error("Please login to comment");
 
     try {
-      const { data } = await axios.post(`http://localhost:8000/api/v1/post/${post._id}/comment`, { text: commentInput }, { withCredentials: true });
+      const { data } = await axios.post(`https://xvent.onrender.com/api/v1/post/${post._id}/comment`, { text: commentInput }, { withCredentials: true });
       toast.success("Comment added!");
       setCommentInput("");
       post.comments.push(data.comment);
