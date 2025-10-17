@@ -20,7 +20,7 @@ const NavbarLoggedIn = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.get("http://localhost:8000/api/v1/user/logout", { withCredentials: true });
+      await axios.get("https://xvent.onrender.com/api/v1/user/logout", { withCredentials: true });
       setCurrentUser(null);
       navigate("/signin");
     } catch (error) {
