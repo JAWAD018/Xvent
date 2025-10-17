@@ -14,7 +14,7 @@ const MyPosts = () => {
   const fetchMyPosts = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:8000/api/v1/post/userpost/all",
+        "https://xvent.onrender.com/api/v1/post/userpost/all",
         { withCredentials: true }
       );
       setPosts(data.posts || []);
@@ -29,7 +29,7 @@ const MyPosts = () => {
 
     try {
       const res = await axios.delete(
-        `http://localhost:8000/api/v1/post/delete/${postId}`,
+        `https://xvent.onrender.com/api/v1/post/delete/${postId}`,
         { withCredentials: true }
       );
 
