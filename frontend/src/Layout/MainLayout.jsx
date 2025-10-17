@@ -19,7 +19,7 @@ const MainLayout = () => {
 
   const fetchEvents = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/v1/event/all", {
+      const res = await axios.get("https://xvent.onrender.com/api/v1/event/all", {
         withCredentials: true,
       });
       console.log("Fetched events:", res.data); // <-- Add this line
@@ -53,7 +53,7 @@ const MainLayout = () => {
 // LogOut
   const handleLogout = async () => {
     try {
-      await axios.get("http://localhost:8000/api/v1/user/logout", { withCredentials: true });
+      await axios.get("https://xvent.onrender.com/api/v1/user/logout", { withCredentials: true });
       setCurrentUser(null);
       navigate("/signin");
     } catch (error) {
