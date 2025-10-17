@@ -13,7 +13,7 @@ const MyProfilePage = () => {
   useEffect(() => {
     const fetchMyProfile = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/v1/user/me", {
+        const res = await axios.get("https://xvent.onrender.com/api/v1/user/me", {
           withCredentials: true,
         });
         setUser(res.data.user);
@@ -40,7 +40,7 @@ const MyProfilePage = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:8000/api/v1/user/profile/edit",
+        "https://xvent.onrender.com/api/v1/user/profile/edit",
         formData,
         {
           withCredentials: true,
