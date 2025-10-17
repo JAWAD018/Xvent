@@ -56,7 +56,7 @@ const Dashboard = () => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get("http://localhost:8000/api/v1/post/all", {
+      const { data } = await axios.get("https://xvent.onrender.com/api/v1/post/all", {
         withCredentials: true,
       });
       setPosts(data.posts || []);
@@ -83,7 +83,7 @@ const Dashboard = () => {
       formData.append("caption", caption);
       formData.append("image", postImage);
 
-      const res = await axios.post("http://localhost:8000/api/v1/post/add", formData, {
+      const res = await axios.post("https://xvent.onrender.com/api/v1/post/add", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
@@ -133,7 +133,7 @@ const Dashboard = () => {
       formData.append("registrationLink", registrationLink);
       formData.append("image", eventImage);
 
-      const res = await axios.post("http://localhost:8000/api/v1/event/add", formData, {
+      const res = await axios.post("https://xvent.onrender.com/api/v1/event/add", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
@@ -164,7 +164,7 @@ const Dashboard = () => {
         )
       );
       const endpoint = isLiked ? "dislike" : "like";
-      await axios.put(`http://localhost:8000/api/v1/post/${postId}/${endpoint}`, {}, { withCredentials: true });
+      await axios.put(`https://xvent.onrender.com/api/v1/post/${postId}/${endpoint}`, {}, { withCredentials: true });
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong");
@@ -188,7 +188,7 @@ const Dashboard = () => {
     if (!currentUserId) return toast.error("Please login to comment");
 
     try {
-      const { data } = await axios.post(`http://localhost:8000/api/v1/post/${postId}/comment`, { text }, { withCredentials: true });
+      const { data } = await axios.post(`https://xvent.onrender.com/api/v1/post/${postId}/comment`, { text }, { withCredentials: true });
       toast.success("Comment added!");
       setCommentInputs(prev => ({ ...prev, [postId]: "" }));
       setPosts(prev => prev.map(post => post._id === postId ? { ...post, comments: [...post.comments, data.comment] } : post));
