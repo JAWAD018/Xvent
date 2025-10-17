@@ -40,7 +40,7 @@ const LoginPage = () => {
   try {
     setLoading(true);
     const { data } = await axios.post(
-      "http://localhost:8000/api/v1/user/login",
+      "https://xvent.onrender.com/api/v1/user/login",
       input,
       { headers: { "Content-Type": "application/json" }, withCredentials: true }
     );
