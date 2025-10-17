@@ -37,7 +37,7 @@ const UpdatePost = () => {
 
     try {
       const { data } = await axios.put(
-        `http://localhost:8000/api/v1/post/update/${id}`,
+        `https://xvent.onrender.com/api/v1/post/update/${id}`,
         formData,
         {
           withCredentials: true,
