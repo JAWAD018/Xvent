@@ -12,7 +12,7 @@ const [currentUser, setCurrentUser] = useState(storedUser || null);
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/v1/user/me", {
+        const res = await axios.get("https://xvent.onrender.com/api/v1/user/me", {
           withCredentials: true,
         });
         setCurrentUser(res.data.user);
@@ -27,7 +27,7 @@ const [currentUser, setCurrentUser] = useState(storedUser || null);
 
   const logout = async () => {
     setCurrentUser(null);
-    await axios.get("http://localhost:8000/api/v1/user/logout", {
+    await axios.get("https://xvent.onrender.com/api/v1/user/logout", {
       withCredentials: true,
     });
   };
