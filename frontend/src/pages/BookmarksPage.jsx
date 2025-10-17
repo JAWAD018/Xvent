@@ -19,7 +19,7 @@ const BookmarksPage = () => {
   if (!currentUser?._id) return;
   setLoading(true);
   try {
-    const { data } = await axios.get("http://localhost:8000/api/v1/user/bookmarks", {
+    const { data } = await axios.get("https://xvent.onrender.com/api/v1/user/bookmarks", {
       withCredentials: true,
     });
     setBookmarks(data.bookmarks || []);
@@ -39,7 +39,7 @@ const BookmarksPage = () => {
   const handleRemoveBookmark = async (id) => {
     try {
       await axios.post(
-        `http://localhost:8000/api/v1/user/bookmark/${id}`,
+        `https://xvent.onrender.com/api/v1/user/bookmark/${id}`,
         {},
         { withCredentials: true }
       );
