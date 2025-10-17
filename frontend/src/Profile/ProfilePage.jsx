@@ -14,7 +14,7 @@ const ProfilePage = () => {
     const fetchProfile = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8000/api/v1/user/${id}/profile`,
+          `https://xvent.onrender.com/api/v1/user/${id}/profile`,
           { withCredentials: true }
         );
         setUser(res.data.user);
