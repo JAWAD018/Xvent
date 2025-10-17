@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { useUser } from "../context/UserContext";
+import { useUser } from "../Context/UserContext";
 import { Loader2, Image, Camera } from "lucide-react";
 import {
   Heart,
