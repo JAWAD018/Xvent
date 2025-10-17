@@ -47,7 +47,7 @@ const AddEventPost = () => {
       formData.append("image", image);
 
       const res = await axios.post(
-        "http://localhost:8000/api/v1/event/add",
+        "https://xvent.onrender.com/api/v1/event/add",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
