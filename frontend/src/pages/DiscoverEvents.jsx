@@ -21,7 +21,7 @@ const DiscoverEvents = () => {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get("http://localhost:8000/api/v1/event/all", {
+      const { data } = await axios.get("https://xvent.onrender.com/api/v1/event/all", {
         withCredentials: true,
       });
 
@@ -37,7 +37,7 @@ const DiscoverEvents = () => {
   // ✅ Fetch bookmarks for current user
   const fetchBookmarks = async () => {
     try {
-      const { data } = await axios.get("http://localhost:8000/api/v1/user/bookmarks", {
+      const { data } = await axios.get("https://xvent.onrender.com/api/v1/user/bookmarks", {
         withCredentials: true,
       });
 
@@ -54,7 +54,7 @@ const DiscoverEvents = () => {
 
     try {
       const { data } = await axios.post(
-        `http://localhost:8000/api/v1/user/bookmark/${eventId}`,
+        `https://xvent.onrender.com/api/v1/user/bookmark/${eventId}`,
         {},
         { withCredentials: true }
       );
