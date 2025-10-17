@@ -34,7 +34,7 @@ const SignupPage = () => {
       setLoading(true);
 
       const res = await axios.post(
-        "http://localhost:8000/api/v1/user/register",
+        "https://xvent.onrender.com/api/v1/user/register",
         {
           username: input.username.trim(),
           email: input.email.trim(),
